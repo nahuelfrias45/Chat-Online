@@ -41,23 +41,28 @@ ids.forEach((doc) => {
   console.log(valueIds)
 })
 
-const aleatorio = randomId()
-
-
-function randomId () {
-  let randomNumber = 1
-  console.log(`este es el primer numero: ${randomNumber}`)
-
-  if (randomNumber == valueIds) {
-    let randomNumber = Math.floor(Math.random() * 10)
-    console.log(`este es el numero del while: ${randomNumber}`)
-    return
+let randomNumber = 1
+export const randomId = function () {
+  let newRandomNumber = Math.floor(Math.random() * 1000)
+  let stringRandomNumber = newRandomNumber.toString()
+ console.log(`numero: ${stringRandomNumber}`)
+  if (valueIds.includes(stringRandomNumber)) {
+    return randomId()
   } else {
-    return randomNumber
+    console.log(newRandomNumber)
+    randomNumber = newRandomNumber
+    console.log(`nuevo numero: ${randomNumber}`)
   }
 }
 
-console.log(`este es el nuevo numero aleatorio: ${aleatorio}`)
+randomId()
+
+console.log(`este es el nuevo numero aleatorio: ${randomNumber}`)
+
+const getIds = await getDocs(collection(db, "chats"));
+getIds.forEach((doc) => {
+  console.log(doc.id, " => ", doc.data());
+});
 
 // config websocket
 io.on('connection', (socket) => {
@@ -71,8 +76,9 @@ io.on('connection', (socket) => {
     const store = collection(db, 'chats')
     let result
     try {
-      result = await setDoc(doc(store, `${aleatorio}`), {
+      result = await setDoc(doc(store, `${randomNumber}`), {
         menssage: msg })
+      randomId()
     } catch (e) {
       console.error(e)
       return
