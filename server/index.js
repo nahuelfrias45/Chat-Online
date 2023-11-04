@@ -5,7 +5,7 @@ import { Server } from "socket.io";
 import { createServer } from "node:http";
 
 import { initializeApp } from "firebase/app";
-import { collection, doc, setDoc, getFirestore } from "firebase/firestore";
+import { collection, doc, setDoc, getDocs, getFirestore } from "firebase/firestore";
 
 const port = process.env.PORT ?? 3000
 
@@ -18,8 +18,8 @@ const io =  new Server(server, {
 //
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCX450egkKtplFxgIXTLa_zg4fRbG14wtI",
-  authDomain: "chat-fad57.firebaseapp.com",
+  apiKey: process.env.API_TOKEN,
+  authDomain: process.env.API_URL,
   projectId: "chat-fad57",
   storageBucket: "chat-fad57.appspot.com",
   messagingSenderId: "57104127608",
@@ -32,8 +32,32 @@ const dbApp = initializeApp(firebaseConfig);
 //config storage
 const db = getFirestore(dbApp);
 
+// consigo los IDs y los guardo en un array
+
+const ids = await getDocs(collection(db,'chats'))
+const valueIds = []
+ids.forEach((doc) => {
+  valueIds.push(doc.id)
+  console.log(valueIds)
+})
+
+const aleatorio = randomId()
 
 
+function randomId () {
+  let randomNumber = 1
+  console.log(`este es el primer numero: ${randomNumber}`)
+
+  if (randomNumber == valueIds) {
+    let randomNumber = Math.floor(Math.random() * 10)
+    console.log(`este es el numero del while: ${randomNumber}`)
+    return
+  } else {
+    return randomNumber
+  }
+}
+
+console.log(`este es el nuevo numero aleatorio: ${aleatorio}`)
 
 // config websocket
 io.on('connection', (socket) => {
@@ -47,7 +71,7 @@ io.on('connection', (socket) => {
     const store = collection(db, 'chats')
     let result
     try {
-      result = await setDoc(doc(store, "1"), {
+      result = await setDoc(doc(store, `${aleatorio}`), {
         menssage: msg })
     } catch (e) {
       console.error(e)
