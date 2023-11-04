@@ -38,26 +38,21 @@ const ids = await getDocs(collection(db,'chats'))
 const valueIds = []
 ids.forEach((doc) => {
   valueIds.push(doc.id)
-  console.log(valueIds)
 })
 
 let randomNumber = 1
 export const randomId = function () {
   let newRandomNumber = Math.floor(Math.random() * 1000)
   let stringRandomNumber = newRandomNumber.toString()
- console.log(`numero: ${stringRandomNumber}`)
   if (valueIds.includes(stringRandomNumber)) {
     return randomId()
   } else {
-    console.log(newRandomNumber)
     randomNumber = newRandomNumber
-    console.log(`nuevo numero: ${randomNumber}`)
   }
 }
 
 randomId()
 
-console.log(`este es el nuevo numero aleatorio: ${randomNumber}`)
 
 const getIds = await getDocs(collection(db, "chats"));
 getIds.forEach((doc) => {
@@ -78,12 +73,12 @@ io.on('connection', (socket) => {
     try {
       result = await setDoc(doc(store, `${randomNumber}`), {
         menssage: msg })
+      } catch (e) {
+        console.error(e)
+        return
+      }
+      io.emit('chat message', msg, randomNumber)
       randomId()
-    } catch (e) {
-      console.error(e)
-      return
-    }
-    io.emit('chat message', msg)
   })
 })
 
